@@ -1,0 +1,12 @@
+{
+  "name": "song-book",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "repository": "git@github.com:Bluesmile82/song-book.git",
+  "author": "Alvaro Leal <pursuance@gmail.com>",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ]
+}
