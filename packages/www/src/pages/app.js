@@ -1,5 +1,5 @@
 import { Router, Link, navigate } from '@reach/router';
-import React, { useContext, useRef, useState, useReducer } from 'react';
+import React, { useContext, useRef, useReducer } from 'react';
 import { IdentityContext } from '../../identity-context';
 import { Container, Heading, Button, Flex, Input, Label, NavLink } from 'theme-ui';
 
