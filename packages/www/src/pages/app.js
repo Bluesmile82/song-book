@@ -5,8 +5,8 @@ import { Container, Heading, Button, Flex, Input, Label, NavLink } from 'theme-u
 import { gql, useMutation, useQuery } from '@apollo/client';
 
 const GET_SONGS = gql`
-  query GetTodos {
-    todos {
+  query GetSongs {
+    songs {
       id
       name
       youtubeId
@@ -24,7 +24,7 @@ const ADD_SONG = gql`
 
 // const UPDATE_SONG = gql`
 //   mutation UpdateSong($id: ID!, $name: String!, $youtubeId: String) {
-//     addTodo(name: $name, youtubeId: $youtubeId) {
+//     updateSong(name: $name, youtubeId: $youtubeId) {
 //       id
 //     }
 //   }
@@ -35,7 +35,7 @@ export default props => {
   const nameRef = useRef(null);
   const youtubeIdRef = useRef(null);
   const formRef = useRef(null);
-  const [addTodo] = useMutation(ADD_SONG);
+  const [addSong] = useMutation(ADD_SONG);
   const { loading, error, data, refetch } = useQuery(GET_SONGS);
   let Dash = () => {
     return (
@@ -69,7 +69,7 @@ export default props => {
             ref={formRef}
             onSubmit={async e => {
               e.preventDefault();
-              await addTodo({
+              await addSong({
                 variables: {
                   name: nameRef.current.value,
                   youtubeId: youtubeIdRef.current.value
