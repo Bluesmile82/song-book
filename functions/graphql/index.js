@@ -11,7 +11,7 @@ const typeDefs = gql`
   }
   type Mutation {
     addSong(name: String!, youtubeId: String): Song
-    updateSongDone(id: ID!, name: String!, youtubeId: String): Song
+    updateSong(id: ID!, name: String!, youtubeId: String): Song
   }
 `;
 
@@ -28,7 +28,7 @@ const resolvers = {
       songs[id] = { id, name, youtubeId };
       return songs[id];
     },
-    updateSongDone: (_, {id, name, youtubeId}) => {
+    updateSong: (_, {id, name, youtubeId}) => {
       songs[id] = { id, name, youtubeId };
       return songs[id];
     }
@@ -42,4 +42,9 @@ const server = new ApolloServer({
   introspection: true
 });
 
-exports.handler = server.createHandler();
+exports.handler = server.createHandler({
+  cors: {
+    origin: "*",
+    credentials: true
+  }
+});

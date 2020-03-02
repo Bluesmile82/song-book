@@ -1,23 +1,42 @@
 import { Router, Link, navigate } from '@reach/router';
-import React, { useContext, useRef, useReducer } from 'react';
+import React, { useContext, useRef } from 'react';
 import { IdentityContext } from '../../identity-context';
 import { Container, Heading, Button, Flex, Input, Label, NavLink } from 'theme-ui';
+import { gql, useMutation, useQuery } from '@apollo/client';
 
-const songsReducer = (state, action) => {
-  switch (action.type) {
-    case 'addSong':
-      return [...state, action.payload]
-    default:
-      break;
+const GET_SONGS = gql`
+  query GetTodos {
+    todos {
+      id
+      name
+      youtubeId
+    }
   }
-}
+`;
+
+const ADD_SONG = gql`
+  mutation AddSong($name: String!, $youtubeId: String) {
+    addSong(name: $name, youtubeId: $youtubeId) {
+      id
+    }
+  }
+`;
+
+// const UPDATE_SONG = gql`
+//   mutation UpdateSong($id: ID!, $name: String!, $youtubeId: String) {
+//     addTodo(name: $name, youtubeId: $youtubeId) {
+//       id
+//     }
+//   }
+// `;
+
 export default props => {
   const { user, identity: netlifyIdentity } = useContext(IdentityContext);
-  const [songs, dispatch] = useReducer(songsReducer, [])
   const nameRef = useRef(null);
   const youtubeIdRef = useRef(null);
   const formRef = useRef(null);
-
+  const [addTodo] = useMutation(ADD_SONG);
+  const { loading, error, data, refetch } = useQuery(GET_SONGS);
   let Dash = () => {
     return (
       <Container>
@@ -48,15 +67,15 @@ export default props => {
           <Flex
             as="form"
             ref={formRef}
-            onSubmit={e => {
+            onSubmit={async e => {
               e.preventDefault();
-              dispatch({
-                type: 'addSong',
-                payload: {
+              await addTodo({
+                variables: {
                   name: nameRef.current.value,
                   youtubeId: youtubeIdRef.current.value
                 }
               });
+              await refetch();
             }}
           >
             <Label sx={{ display: 'flex' }}>
@@ -74,13 +93,17 @@ export default props => {
             <Button sx={{ marginLeft: 1 }}>Submit</Button>
           </Flex>
           <Flex sx={{ flexDirection: 'column' }}>
-            <ul>
-              {songs.map(song => (
-                <li key={song.name}>
-                  <span>{song.name}</span>
-                </li>
-              ))}
-            </ul>
+            {loading && <div>Loading...</div>}
+            {error && <div>{error.message}</div>}
+            {!loading && !error && (
+              <ul>
+                {data.songs.map(song => (
+                  <li key={song.id}>
+                    <span>{song.name}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Flex>
         </Flex>
       </Container>
