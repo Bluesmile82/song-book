@@ -10,8 +10,8 @@ const typeDefs = gql`
     youtubeId: String
   }
   type Mutation {
-    addSong(): Song
-    updateSongDone(id: ID!): Song
+    addSong(name: String!, youtubeId: String): Song
+    updateSongDone(id: ID!, name: String!, youtubeId: String): Song
   }
 `;
 
@@ -24,7 +24,7 @@ const resolvers = {
   Mutation: {
     addSong: (_, {name, youtubeId}) => {
       songIndex++;
-      const id = `key-${songIndex}`;
+      const id = songIndex;
       songs[id] = { id, name, youtubeId };
       return songs[id];
     }
