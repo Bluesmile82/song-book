@@ -27,11 +27,11 @@ const resolvers = {
       const id = songIndex;
       songs[id] = { id, name, youtubeId };
       return songs[id];
+    },
+    updateSongDone: (_, {id, name, youtubeId}) => {
+      songs[id] = { id, name, youtubeId };
+      return songs[id];
     }
-  },
-  updateSongDone: (_, {id, name, youtubeId}) => {
-    songs[id] = { id, name, youtubeId };
-    return songs[id];
   }
 };
 
