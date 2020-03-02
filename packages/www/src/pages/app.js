@@ -34,7 +34,7 @@ export default props => {
   const { user, identity: netlifyIdentity } = useContext(IdentityContext);
   const nameRef = useRef(null);
   const youtubeIdRef = useRef(null);
-  // const [addSong] = useMutation(ADD_SONG);
+  const [addSong] = useMutation(ADD_SONG);
   const { loading, error, data, refetch } = useQuery(GET_SONGS);
   let Dash = () => {
     return (
@@ -67,12 +67,12 @@ export default props => {
             as="form"
             onSubmit={async (e) => {
               e.preventDefault();
-              // await addSong({
-              //   variables: {
-              //     name: nameRef.current.value,
-              //     youtubeId: youtubeIdRef.current.value
-              //   }
-              // });
+              await addSong({
+                variables: {
+                  name: nameRef.current.value,
+                  youtubeId: youtubeIdRef.current.value
+                }
+              });
               await refetch();
             }}
           >
