@@ -17,7 +17,11 @@ const GET_SONGS = gql`
   query GetSongs {
     songs {
       id
-      name
+      title
+      author
+      key
+      lyrics
+      style
       youtubeId
     }
   }
@@ -63,6 +67,7 @@ export default props => {
   const youtubeIdRef = useRef(null);
   const [addSong] = useMutation(ADD_SONG);
   const { loading, error, data, refetch } = useQuery(GET_SONGS);
+  console.log('t', titleRef)
   const onSubmit = async e => {
     e.preventDefault();
     await addSong({
@@ -78,7 +83,7 @@ export default props => {
     await refetch();
   };
 
-  const FormLabel = ({ label, ref, textarea }) => {
+  const FormLabel = React.forwardRef(({ label, textarea }, ref) => {
     const InputComponent = textarea ? Textarea : Input;
     return (
       <Label sx={{ display: 'flex', marginBottom: 3 }}>
@@ -86,7 +91,7 @@ export default props => {
         <InputComponent ref={ref} sx={{ marginLeft: 3 }} name={label} />
       </Label>
     );
-  };
+  });
 
   let Dash = () => {
     return (
@@ -131,7 +136,7 @@ export default props => {
               <ul>
                 {data.songs.map(song => (
                   <li key={song.id}>
-                    <span>{song.name}</span>
+                    <span>{song.title}</span>
                   </li>
                 ))}
               </ul>
