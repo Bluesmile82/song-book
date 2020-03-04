@@ -6,12 +6,31 @@ const typeDefs = gql`
   }
   type Song {
     id: ID!
-    name: String!
+    title: String!
+    author: String
+    key: String
+    style: String
+    lyrics: String
     youtubeId: String
   }
   type Mutation {
-    addSong(name: String!, youtubeId: String): Song
-    updateSong(id: ID!, name: String!, youtubeId: String): Song
+    addSong(
+      title: String!,
+      author: String,
+      key: String,
+      style: String,
+      lyrics: String,
+      youtubeId: String
+    ): Song
+    updateSong(
+      id: ID!,
+      title: String!,
+      author: String,
+      key: String,
+      style: String,
+      lyrics: String,
+      youtubeId: String
+    ): Song
   }
 `;
 
@@ -22,14 +41,14 @@ const resolvers = {
     songs: () => Object.values(songs)
   },
   Mutation: {
-    addSong: (_, {name, youtubeId}) => {
+    addSong: (_, {title, author, key, style, lyrics, youtubeId}) => {
       songIndex++;
       const id = songIndex;
-      songs[id] = { id, name, youtubeId };
+      songs[id] = { id, title, author, key, style, lyrics, youtubeId };
       return songs[id];
     },
-    updateSong: (_, {id, name, youtubeId}) => {
-      songs[id] = { id, name, youtubeId };
+    updateSong: (_, {id, title, author, key, style, lyrics, youtubeId}) => {
+      songs[id] = { id, title, author, key, style, lyrics, youtubeId };
       return songs[id];
     }
   }
