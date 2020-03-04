@@ -10,7 +10,8 @@ import {
   Textarea,
   Label,
   NavLink,
-  Box
+  Box,
+  Select
 } from 'theme-ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
 
@@ -83,12 +84,46 @@ export default props => {
     await refetch();
   };
 
-  const FormLabel = React.forwardRef(({ label, textarea }, ref) => {
+  const FormLabel = React.forwardRef(({ label, textarea, selectOptions }, ref) => {
+    if (selectOptions) {
+      return (
+        <Label
+          sx={{
+            display: 'flex',
+            marginBottom: 3,
+            justifyContent: 'space-between'
+          }}
+        >
+          <span>{label}</span>
+          <Select
+            ref={ref}
+            name={label}
+            sx={{
+              minWidth: '60px'
+            }}
+          >
+            {selectOptions.map(s => (
+              <option key={s}>{s}</option>
+            ))}
+          </Select>
+        </Label>
+      );
+    }
     const InputComponent = textarea ? Textarea : Input;
     return (
-      <Label sx={{ display: 'flex', marginBottom: 3 }}>
+      <Label
+        sx={{
+          display: 'flex',
+          marginBottom: 3,
+          justifyContent: 'space-between'
+        }}
+      >
         <span>{label}</span>
-        <InputComponent ref={ref} sx={{ marginLeft: 3 }} name={label} />
+        <InputComponent
+          ref={ref}
+          sx={{ marginLeft: 3, whiteSpace: 'pre-wrap' }}
+          name={label}
+        />
       </Label>
     );
   });
@@ -114,18 +149,45 @@ export default props => {
       </Button>
     </Flex>
   );
-
+  const keys = [
+    'C',
+    'C#',
+    'Cb',
+    'D',
+    'D#',
+    'Db',
+    'E',
+    'E#',
+    'Eb',
+    'F',
+    'F#',
+    'Fb',
+    'G',
+    'G#',
+    'Gb',
+    'A',
+    'A#',
+    'Ab',
+    'B',
+    'B#',
+    'Bb'
+  ];
   const form = (
     <Flex as="form" onSubmit={onSubmit} sx={{ flexDirection: 'column' }}>
       <FormLabel label="title" ref={titleRef} />
       <FormLabel label="author" ref={authorRef} />
-      <FormLabel label="key" ref={keyRef} />
+      <FormLabel
+        label="key"
+        ref={keyRef}
+        selectOptions={keys}
+      />
       <FormLabel label="style" ref={styleRef} />
       <FormLabel label="lyrics" ref={lyricsRef} textarea />
       <FormLabel label="youtube id" ref={youtubeIdRef} />
       <Button sx={{ marginLeft: 1 }}>Submit</Button>
     </Flex>
   );
+
   const ViewSongs = () => {
     const [search, setSearch] = useState('');
     return(
@@ -182,14 +244,16 @@ export default props => {
                 <div>{song.lyrics}</div>
               </Flex>
             </Box>
-            <iframe
-              width="560"
-              height="315"
-              src={`https://www.youtube.com/embed/${song.youtubeId}`}
-              frameborder="0"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-            ></iframe>
+            {song.youtubeId && (
+              <iframe
+                width="560"
+                height="315"
+                src={`https://www.youtube.com/embed/${song.youtubeId}`}
+                frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            )}
             <NavLink as={Link} to={`/songs/edit/${song.id}`} p={2}>
               Edit
             </NavLink>
