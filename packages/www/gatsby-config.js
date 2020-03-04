@@ -9,10 +9,9 @@ module.exports = {
       options: {
         name: `Song Book`,
         short_name: `SongBook`,
-        start_url: `/`,
-        background_color: `#f7f0eb`,
-        theme_color: `#4444ff`,
-        display: `standalone`
+        start_url: `/songs`,
+        display: `standalone`,
+        icon: `src/images/icon.png`
       }
     },
     [`gatsby-plugin-offline`]
