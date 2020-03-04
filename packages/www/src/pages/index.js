@@ -9,14 +9,11 @@ export default props => {
     <Container>
       <Flex sx={{ flexDirection: 'column', padding: 3, align: 'right' }}>
         <Flex as="nav">
-          <NavLink as={Link} to="/" p={2}>
-            Home
-          </NavLink>
-          {user && <NavLink as={Link} to="/app" p={2}>
+          {user && <NavLink as={Link} to="/songs" p={2}>
             Songs
           </NavLink>}
           {user && (
-            <NavLink href="#!" to="/app" p={2}>
+            <NavLink href="#!" to="/songs" p={2}>
               {user.user_metadata.full_name}
             </NavLink>
           )}
