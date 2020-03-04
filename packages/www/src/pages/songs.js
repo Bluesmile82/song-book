@@ -60,7 +60,6 @@ const ADD_SONG = gql`
 
 export default props => {
   const { user, identity: netlifyIdentity } = useContext(IdentityContext);
-  const searchRef = useRef(null);
   const titleRef = useRef(null);
   const authorRef = useRef(null);
   const keyRef = useRef(null);
@@ -68,7 +67,6 @@ export default props => {
   const lyricsRef = useRef(null);
   const youtubeIdRef = useRef(null);
   const [addSong] = useMutation(ADD_SONG);
-  const [search, setSearch] = useState('');
   const { loading, error, data, refetch } = useQuery(GET_SONGS);
   const onSubmit = async e => {
     e.preventDefault();
@@ -128,35 +126,37 @@ export default props => {
       <Button sx={{ marginLeft: 1 }}>Submit</Button>
     </Flex>
   );
-  const viewSongs = (
-    <Flex sx={{ flexDirection: 'column' }}>
-      {loading && <div>Loading...</div>}
-      {error && <div>{error.message}</div>}
-      {!loading && !error && (
-        <>
-          <Input
-            placeholder="Search for..."
-            ref={searchRef}
-            onKeyDown={() => setSearch(searchRef.current.value)}
-          />
-          <ol>
-            {data.songs
-              .filter(song => (search ? song.title.startsWith(search) : true))
-              .map(song => (
-                <li key={song.id}>
-                  <NavLink as={Link} to={`/songs/${song.id}`} p={2}>
-                    {song.title}
-                  </NavLink>
-                  <NavLink as={Link} to={`/songs/edit/${song.id}`} p={2}>
-                    Edit
-                  </NavLink>
-                </li>
-              ))}
-          </ol>
-        </>
-      )}
-    </Flex>
-  );
+  const ViewSongs = () => {
+    const [search, setSearch] = useState('');
+    return(
+      <Flex sx={{ flexDirection: 'column' }}>
+        {loading && <div>Loading...</div>}
+        {error && <div>{error.message}</div>}
+        {!loading && !error && (
+          <>
+            <Input
+              placeholder="Search for..."
+              onChange={term => setSearch(term.target.value)}
+            />
+            <ol>
+              {data.songs
+                .filter(song => (search ? song.title.startsWith(search) : true))
+                .map(song => (
+                  <li key={song.id}>
+                    <NavLink as={Link} to={`/songs/${song.id}`} p={2}>
+                      {song.title}
+                    </NavLink>
+                    <NavLink as={Link} to={`/songs/edit/${song.id}`} p={2}>
+                      Edit
+                    </NavLink>
+                  </li>
+                ))}
+            </ol>
+          </>
+        )}
+      </Flex>
+    )
+  };
 
   const viewSong = (id) => {
     const song = data && data.songs.find(s => s.id === id);
@@ -176,23 +176,20 @@ export default props => {
                   alignItems: 'center'
                 }}
               >
-                <div>
-                  {song.author}
-                </div>
-                <div>
-                  {song.key}
-                </div>
-                <div>
-                  {song.style}
-                </div>
-                <div>
-                  {song.youtubeId}
-                </div>
-                <div>
-                  {song.lyrics}
-                </div>
+                <div>{song.author}</div>
+                <div>{song.key}</div>
+                <div>{song.style}</div>
+                <div>{song.lyrics}</div>
               </Flex>
             </Box>
+            <iframe
+              width="560"
+              height="315"
+              src={`https://www.youtube.com/embed/${song.youtubeId}`}
+              frameborder="0"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
             <NavLink as={Link} to={`/songs/edit/${song.id}`} p={2}>
               Edit
             </NavLink>
@@ -203,7 +200,6 @@ export default props => {
   }
 
   let Song = ({ songId }) => {
-    console.log(props)
     return (
       <Container>
         <NavLink as={Link} to={`/songs/`} p={2}>
@@ -223,7 +219,7 @@ export default props => {
             Songs
           </Heading>
           {form}
-          {viewSongs}
+          <ViewSongs/>
         </Flex>
       </Container>
     );
