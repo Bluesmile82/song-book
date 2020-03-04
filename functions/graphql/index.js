@@ -38,7 +38,9 @@ let songIndex = 0;
 const songs = {};
 const resolvers = {
   Query: {
-    songs: () => Object.values(songs)
+    songs: (parent, args, { user }) => {
+      return user ? Object.values(songs) : [];
+    }
   },
   Mutation: {
     addSong: (_, {title, author, key, style, lyrics, youtubeId}) => {
@@ -57,6 +59,13 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ context }) => {
+    if (context.clientContext.user) {
+      return { user: context.clientContext.user.sub };
+    } else {
+      return {};
+    }
+  },
   playground: true,
   introspection: true
 });
