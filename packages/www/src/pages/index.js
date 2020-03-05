@@ -1,28 +1,18 @@
 import React, { useContext } from 'react';
 import { IdentityContext } from '../../identity-context';
-import { Container, Heading, Button, Flex, NavLink } from 'theme-ui';
-import { Link } from '@reach/router';
+import { Container, Button } from 'theme-ui';
+import Nav from '../components/Nav';
 
 export default props => {
   const { user, identity: netlifyIdentity } = useContext(IdentityContext);
   return (
     <Container>
-      <Flex sx={{ flexDirection: 'column', padding: 3, align: 'right' }}>
-        <Flex as="nav">
-          {user && <NavLink as={Link} to="/songs" p={2}>
-            Songs
-          </NavLink>}
-          {user && (
-            <NavLink href="#!" to="/songs" p={2}>
-              {user.user_metadata.full_name}
-            </NavLink>
-          )}
-        </Flex>
-        <Heading as="h1">Song book</Heading>
+      <Nav user={user} identity={netlifyIdentity} />
+      {!user && (
         <Button sx={{ marginTop: 2 }} onClick={() => netlifyIdentity.open()}>
           Sign up / Log in
         </Button>
-      </Flex>
+      )}
     </Container>
   );
 }

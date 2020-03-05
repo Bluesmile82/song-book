@@ -14,6 +14,7 @@ import {
   Select
 } from 'theme-ui';
 import { gql, useMutation, useQuery } from '@apollo/client';
+import Nav from '../components/Nav';
 
 const GET_SONGS = gql`
   query GetSongs {
@@ -128,27 +129,6 @@ export default props => {
     );
   });
 
-  const nav = (
-    <Flex as="nav">
-      <NavLink as={Link} to="/songs" p={2}>
-        Songs
-      </NavLink>
-      {user && (
-        <NavLink href="#!" to="/songs" p={2}>
-          {user.user_metadata.full_name}
-        </NavLink>
-      )}
-      <Button
-        sx={{ marginTop: 2 }}
-        onClick={() => {
-          netlifyIdentity.logout();
-          navigate(`/`);
-        }}
-      >
-        Log out
-      </Button>
-    </Flex>
-  );
   const keys = [
     'C',
     'C#',
@@ -246,6 +226,7 @@ export default props => {
             </Box>
             {song.youtubeId && (
               <iframe
+                title={song.title}
                 width="560"
                 height="315"
                 src={`https://www.youtube.com/embed/${song.youtubeId}`}
@@ -278,12 +259,12 @@ export default props => {
     return (
       <Container>
         <Flex sx={{ flexDirection: 'column', padding: 3, align: 'right' }}>
-          {nav}
+          <Nav user={user} identity={netlifyIdentity} />
           <Heading as="h1" sx={{ marginBottom: 3 }}>
             Songs
           </Heading>
           {form}
-          <ViewSongs/>
+          <ViewSongs />
         </Flex>
       </Container>
     );
