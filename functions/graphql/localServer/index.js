@@ -6,7 +6,7 @@ const server = new ApolloServer({
   resolvers,
   context: ({ context }) => {
     if (context && context.clientContext.user) {
-      return { user: context.clientContext.user.sub };
+      return { user: context.clientContext.user };
     } else {
       return {};
     }
