@@ -55,12 +55,16 @@ const resolvers = {
     }
   },
   Mutation: {
-    addSong: async (_, {title, author, key, style, lyrics, youtubeId}, { user }) => {
+    addSong: async (
+      _,
+      { title, author, key, style, lyrics, youtubeId },
+      { user }
+    ) => {
       if (!user) {
-        throw new Error("Must be authenticated to create a song")
+        throw new Error('Must be authenticated to create a song');
       }
       const results = await client.query(
-        q.Create(q.Collection("songs"), {
+        q.Create(q.Collection('songs'), {
           data: {
             title,
             author,
@@ -77,12 +81,16 @@ const resolvers = {
         id: results.ref.id
       };
     },
-    updateSong: async (_, {id, title, author, key, style, lyrics, youtubeId}) => {
+    updateSong: async (
+      _,
+      { id, title, author, key, style, lyrics, youtubeId },
+      { user }
+    ) => {
       if (!user) {
-        throw new Error("Must be authenticated to create a song")
+        throw new Error('Must be authenticated to create a song');
       }
-       const results = await client.query(
-        q.Update(q.Ref(q.Collection("songs"), id), {
+      const results = await client.query(
+        q.Update(q.Ref(q.Collection('songs'), id), {
           data: {
             title,
             author,
@@ -105,6 +113,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ context }) => {
+    console.log('x', context)
     if (context.clientContext.user) {
       return { user: context.clientContext.user.sub };
     } else {
