@@ -77,7 +77,7 @@ const resolvers = {
         id: results.ref.id
       };
     },
-    updateSong: (_, {id, title, author, key, style, lyrics, youtubeId}) => {
+    updateSong: async (_, {id, title, author, key, style, lyrics, youtubeId}) => {
       if (!user) {
         throw new Error("Must be authenticated to create a song")
       }

@@ -1,4 +1,4 @@
-import { Router, Link, navigate } from '@reach/router';
+import { Router, Link } from '@reach/router';
 import React, { useContext, useRef, useState } from 'react';
 import { IdentityContext } from '../../identity-context';
 import {
