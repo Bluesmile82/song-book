@@ -28,9 +28,10 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
+      userId: user && user.id,
       Authorization: token ? `Bearer ${token}` : ''
     }
-  }
+  };
 });
 
 const client = new ApolloClient({
