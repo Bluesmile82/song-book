@@ -40,8 +40,10 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     songs: async (parent, args, { user }) => {
+      console.log('x', { user, args, parent });
+
       if (!user) {
-        return [];
+        throw new Error('Must be authenticated to see the songs');
       } else {
         const results = await client.query(
           q.Paginate(q.Match(q.Index('songs_by_user'), user))
@@ -87,7 +89,7 @@ const resolvers = {
       { user }
     ) => {
       if (!user) {
-        throw new Error('Must be authenticated to create a song');
+        throw new Error('Must be authenticated to update a song');
       }
       const results = await client.query(
         q.Update(q.Ref(q.Collection('songs'), id), {
@@ -113,8 +115,8 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ context }) => {
-    console.log('x', context)
-    if (context.clientContext.user) {
+    console.log('con', context)
+    if (context && context.clientContext.user) {
       return { user: context.clientContext.user.sub };
     } else {
       return {};
@@ -123,6 +125,9 @@ const server = new ApolloServer({
   playground: true,
   introspection: true
 });
+
+exports.typeDefs = typeDefs;
+exports.resolvers = resolvers;
 
 exports.handler = server.createHandler({
   cors: {
