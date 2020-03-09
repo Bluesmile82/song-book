@@ -39,22 +39,32 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    songs: async () => {
-      const results = await client.query(
-        q.Paginate(q.Match(q.Index('all_songs')))
-      );
-      return results.data.map(([ref, title, youtubeId]) => ({
-        id: ref.id,
-        title,
-        youtubeId
-      }));
+    songs: async (parent, args, { user }) => {
+      console.log('x', { user, args, parent });
+
+      if (!user) {
+        throw new Error('Must be authenticated to see the songs');
+      } else {
+        const results = await client.query(
+          q.Paginate(q.Match(q.Index('songs_by_user'), user))
+        );
+        return results.data.map(([ref, title, youtubeId]) => ({
+          id: ref.id,
+          title,
+          youtubeId
+        }));
+      }
     }
   },
   Mutation: {
     addSong: async (
       _,
       { title, author, key, style, lyrics, youtubeId },
+      { user }
     ) => {
+      if (!user) {
+        throw new Error('Must be authenticated to create a song');
+      }
       const results = await client.query(
         q.Create(q.Collection('songs'), {
           data: {
@@ -63,7 +73,8 @@ const resolvers = {
             key,
             style,
             lyrics,
-            youtubeId
+            youtubeId,
+            owner: user
           }
         })
       );
@@ -75,7 +86,11 @@ const resolvers = {
     updateSong: async (
       _,
       { id, title, author, key, style, lyrics, youtubeId },
+      { user }
     ) => {
+      if (!user) {
+        throw new Error('Must be authenticated to update a song');
+      }
       const results = await client.query(
         q.Update(q.Ref(q.Collection('songs'), id), {
           data: {
@@ -99,6 +114,13 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ context }) => {
+    if (context && context.clientContext.user) {
+      return { user: context.clientContext.user };
+    } else {
+      return {};
+    }
+  },
   playground: true,
   introspection: true
 });

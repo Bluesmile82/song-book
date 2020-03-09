@@ -7,7 +7,7 @@ const Nav = ({ user, identity }) => (
     <NavLink as={Link} to="/songs" p={2}>
       Songs
     </NavLink>
-    {user && (
+    {/* {user && (
       <Flex>
         <NavLink href="#!" to="/songs" p={2}>
           {user.user_metadata.full_name}
@@ -22,7 +22,7 @@ const Nav = ({ user, identity }) => (
           Log out
         </Button>
       </Flex>
-    )}
+    )} */}
   </Flex>
 );
 

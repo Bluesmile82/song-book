@@ -1,6 +1,6 @@
 import { Router, Link } from '@reach/router';
 import React, { useContext, useRef, useState } from 'react';
-import { IdentityContext } from '../../identity-context';
+// import { IdentityContext } from '../../identity-context';
 import {
   Container,
   Heading,
@@ -61,7 +61,7 @@ const ADD_SONG = gql`
 // `;
 
 export default props => {
-  const { user, identity: netlifyIdentity } = useContext(IdentityContext);
+  // const { user, identity: netlifyIdentity } = useContext(IdentityContext);
   const titleRef = useRef(null);
   const authorRef = useRef(null);
   const keyRef = useRef(null);
@@ -259,7 +259,7 @@ export default props => {
     return (
       <Container>
         <Flex sx={{ flexDirection: 'column', padding: 3, align: 'right' }}>
-          <Nav user={user} identity={netlifyIdentity} />
+          <Nav />
           <Heading as="h1" sx={{ marginBottom: 3 }}>
             Songs
           </Heading>
