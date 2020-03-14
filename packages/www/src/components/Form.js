@@ -60,7 +60,7 @@ const ADD_PLAYLIST = gql`
   mutation AddPlaylist(
     $name: String!
   ) {
-    addSong(
+    addPlaylist(
       name: $name
     ) {
       id
@@ -73,7 +73,7 @@ const UPDATE_PLAYLIST = gql`
     $id: ID!
     $name: String!
   ) {
-    updateSong(
+    updatePlaylist(
       id: $id
       name: $name
     ) {
@@ -176,6 +176,7 @@ const Form = ({ currentItem, refetch, collection }) => {
 
   const onSubmit = async (e, id) => {
     e.preventDefault();
+    console.log(collection)
     if (id) {
       if (collection === 'playlists') {
         await updatePlaylist({

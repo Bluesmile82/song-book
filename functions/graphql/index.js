@@ -52,6 +52,7 @@ const resolvers = {
   Query: {
     songs: async () => {
       const results = await client.query(q.Paginate(q.Match(q.Index('songs'))));
+      console.log('results', results)
       if (!results) return [];
       return results.data.map(d => {
         const [
@@ -80,6 +81,7 @@ const resolvers = {
   Query: {
     playlists: async () => {
       const results = await client.query(q.Paginate(q.Match(q.Index('playlists'))));
+      console.log('s', results)
       if (!results) return [];
       return results.data.map(d => {
         const [

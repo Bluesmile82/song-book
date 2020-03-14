@@ -5,7 +5,8 @@ import {
   Heading,
   Flex,
   Input,
-  NavLink
+  NavLink,
+  Box
 } from 'theme-ui';
 import { gql, useQuery } from '@apollo/client';
 import Nav from '../components/Nav';
@@ -61,6 +62,44 @@ export default () => {
     );
   };
 
+  const viewPlaylist = id => {
+    const playlist = data && data.playlists.find(s => s.id === id);
+    return (
+      <Flex sx={{ flexDirection: 'column' }}>
+        {loading && <div>Loading...</div>}
+        {error && <div>{error.message}</div>}
+        {!loading && !error && playlist && (
+          <Flex sx={{ flexDirection: 'column' }}>
+            <Box p={2} color="white" bg="primary">
+              {playlist.name}
+            </Box>
+            <NavLink as={Link} to={`/playlists/edit/${playlist.id}`} p={2}>
+              Edit
+            </NavLink>
+          </Flex>
+        )}
+      </Flex>
+    );
+  };
+
+  const editPlaylist = id => {
+    const playlist = data && data.playlists.find(s => s.id === id);
+    return (
+      <Flex sx={{ flexDirection: 'column' }}>
+        {loading && <div>Loading...</div>}
+        {error && <div>{error.message}</div>}
+        {!loading && !error && playlist && (
+          <Flex sx={{ flexDirection: 'column' }}>
+            <Box p={2} color="white" bg="primary">
+              {playlist.name}
+            </Box>
+            <Form currentItem={playlist} collection="playlists" refetch={refetch} />
+          </Flex>
+        )}
+      </Flex>
+    );
+  };
+
   const Playlists = () => {
     return (
       <Container>
@@ -76,9 +115,33 @@ export default () => {
     );
   };
 
+  let Playlist = ({ playlistId }) => {
+    return (
+      <Container>
+        <NavLink as={Link} to={`/playlists/`} p={2}>
+          {'<'} Back
+        </NavLink>
+        {viewPlaylist(playlistId)}
+      </Container>
+    );
+  };
+
+  let EditPlaylist = ({ playlistId }) => {
+    return (
+      <Container>
+        <NavLink as={Link} to={`/playlists/`} p={2}>
+          {'<'} Back
+        </NavLink>
+        {editPlaylist(playlistId)}
+      </Container>
+    );
+  };
+
   return (
     <Router>
       <Playlists path="/playlists" />
+      <Playlist path="/playlists/:playlistId" />
+      <EditPlaylist path="/playlists/edit/:playlistId" />
     </Router>
   );
 }
