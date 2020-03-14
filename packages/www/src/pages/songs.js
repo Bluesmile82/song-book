@@ -51,13 +51,28 @@ const ADD_SONG = gql`
   }
 `;
 
-// const UPDATE_SONG = gql`
-//   mutation UpdateSong($id: ID!, $name: String!, $youtubeId: String) {
-//     updateSong(name: $name, youtubeId: $youtubeId) {
-//       id
-//     }
-//   }
-// `;
+const UPDATE_SONG = gql`
+  mutation UpdateSong(
+    $id: ID!,
+    $title: String!
+    $author: String!
+    $key: String!
+    $style: String!
+    $lyrics: String!
+    $youtubeId: String
+  ) {
+    updateSong(
+      title: $title,
+      author: $author,
+      key: $key,
+      style: $style,
+      lyrics: $lyrics,
+      youtubeId: $youtubeId
+    ) {
+      id
+    }
+  }
+`;
 
 export default props => {
   const titleRef = useRef(null);
@@ -67,19 +82,43 @@ export default props => {
   const lyricsRef = useRef(null);
   const youtubeIdRef = useRef(null);
   const [addSong] = useMutation(ADD_SONG);
+  const [updateSong] = useMutation(UPDATE_SONG);
   const { loading, error, data, refetch } = useQuery(GET_SONGS);
-  const onSubmit = async e => {
+  const onSubmit = async (e, id) => {
     e.preventDefault();
-    await addSong({
-      variables: {
+    if (id) {
+      console.log({
+        id,
         title: titleRef.current.value,
         key: keyRef.current.value,
         author: authorRef.current.value,
         style: styleRef.current.value,
         lyrics: lyricsRef.current.value,
         youtubeId: youtubeIdRef.current.value
-      }
-    });
+      });
+      await updateSong({
+        variables: {
+          id,
+          title: titleRef.current.value,
+          key: keyRef.current.value,
+          author: authorRef.current.value,
+          style: styleRef.current.value,
+          lyrics: lyricsRef.current.value,
+          youtubeId: youtubeIdRef.current.value
+        }
+      });
+    } else {
+      await addSong({
+        variables: {
+          title: titleRef.current.value,
+          key: keyRef.current.value,
+          author: authorRef.current.value,
+          style: styleRef.current.value,
+          lyrics: lyricsRef.current.value,
+          youtubeId: youtubeIdRef.current.value
+        }
+      });
+    }
     await refetch();
   };
 
@@ -150,15 +189,15 @@ export default props => {
     'B#',
     'Bb'
   ];
-  const form = (
-    <Flex as="form" onSubmit={onSubmit} sx={{ flexDirection: 'column' }}>
+  const form = (editId = false) => (
+    <Flex
+      as="form"
+      onSubmit={e => onSubmit(e, editId)}
+      sx={{ flexDirection: 'column' }}
+    >
       <FormLabel label="title" ref={titleRef} />
       <FormLabel label="author" ref={authorRef} />
-      <FormLabel
-        label="key"
-        ref={keyRef}
-        selectOptions={keys}
-      />
+      <FormLabel label="key" ref={keyRef} selectOptions={keys} />
       <FormLabel label="style" ref={styleRef} />
       <FormLabel label="lyrics" ref={lyricsRef} textarea />
       <FormLabel label="youtube id" ref={youtubeIdRef} />
@@ -241,6 +280,47 @@ export default props => {
       </Flex>
     );
   }
+  const editSong = (id) => {
+    const song = data && data.songs.find(s => s.id === id);
+    return (
+      <Flex sx={{ flexDirection: 'column' }}>
+        {loading && <div>Loading...</div>}
+        {error && <div>{error.message}</div>}
+        {!loading && !error && song && (
+          <Flex sx={{ flexDirection: 'column' }}>
+            <Box p={2} color="white" bg="primary">
+              {song.title}
+            </Box>
+            <Box p={4}>
+              <Flex
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <div>{song.author}</div>
+                <div>{song.key}</div>
+                <div>{song.style}</div>
+                <div>{song.lyrics}</div>
+              </Flex>
+            </Box>
+            {song.youtubeId && (
+              <iframe
+                title={song.title}
+                width="560"
+                height="315"
+                src={`https://www.youtube.com/embed/${song.youtubeId}`}
+                frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            )}
+            {form(id)}
+          </Flex>
+        )}
+      </Flex>
+    );
+  }
 
   let Song = ({ songId }) => {
     return (
@@ -253,6 +333,17 @@ export default props => {
     );
   }
 
+  let EditSong = ({ songId }) => {
+    return (
+      <Container>
+        <NavLink as={Link} to={`/songs/`} p={2}>
+          {'<'} Back
+        </NavLink>
+        {editSong(songId)}
+      </Container>
+    );
+  }
+
   let Dash = (props) => {
     return (
       <Container>
@@ -261,7 +352,7 @@ export default props => {
           <Heading as="h1" sx={{ marginBottom: 3 }}>
             Songs
           </Heading>
-          {form}
+          {form()}
           <ViewSongs />
         </Flex>
       </Container>
@@ -272,6 +363,7 @@ export default props => {
     <Router>
       <Dash path="/songs" />
       <Song path="/songs/:songId" />
+      <EditSong path="/songs/edit/:songId" />
     </Router>
   );
 }
