@@ -26,8 +26,18 @@ const GET_SONGS = gql`
   }
 `;
 
-export default props => {
+const GET_PLAYLISTS = gql`
+  query GetPlaylists {
+    playlists {
+      id
+      name
+    }
+  }
+`;
+
+export default () => {
   const { loading, error, data, refetch } = useQuery(GET_SONGS);
+  const { loading: playlistLoading, error: playlistError, data: playlistData, refetch: refetchPlaylists } = useQuery(GET_PLAYLISTS);
 
   const ViewSongs = () => {
     const [search, setSearch] = useState('');
@@ -59,6 +69,44 @@ export default props => {
         )}
       </Flex>
     )
+  };
+
+  const ViewPlaylists = () => {
+    const [search, setSearch] = useState('');
+    return (
+      <Flex sx={{ flexDirection: 'column' }}>
+        {playlistLoading && <div>Loading...</div>}
+        {playlistError && <div>{playlistError.message}</div>}
+        {!playlistLoading && !playlistError && (
+          <>
+            <Input
+              placeholder="Search for..."
+              onChange={term => setSearch(term.target.value)}
+            />
+            <ol>
+              {playlistData.playlists
+                .filter(playlist =>
+                  search ? playlist.title.startsWith(search) : true
+                )
+                .map(playlist => (
+                  <li key={playlist.id}>
+                    <NavLink as={Link} to={`/playlists/${playlist.id}`} p={2}>
+                      {playlist.name}
+                    </NavLink>
+                    <NavLink
+                      as={Link}
+                      to={`/playlists/edit/${playlist.id}`}
+                      p={2}
+                    >
+                      Edit
+                    </NavLink>
+                  </li>
+                ))}
+            </ol>
+          </>
+        )}
+      </Flex>
+    );
   };
 
   const viewSong = (id) => {
@@ -140,7 +188,7 @@ export default props => {
                 allowfullscreen
               ></iframe>
             )}
-            <Form currentSong={song} refetch={refetch}/>
+            <Form currentItem={song} refetch={refetch}/>
           </Flex>
         )}
       </Flex>
@@ -169,7 +217,7 @@ export default props => {
     );
   }
 
-  let Dash = (props) => {
+  const Songs = () => {
     return (
       <Container>
         <Flex sx={{ flexDirection: 'column', padding: 3, align: 'right' }}>
@@ -184,9 +232,25 @@ export default props => {
     );
   };
 
+  const Playlists = () => {
+    return (
+      <Container>
+        <Flex sx={{ flexDirection: 'column', padding: 3, align: 'right' }}>
+          <Nav />
+          <Heading as="h1" sx={{ marginBottom: 3 }}>
+            Playlists
+          </Heading>
+          <Form refetch={refetchPlaylists} collection="playlists" />
+          <ViewPlaylists />
+        </Flex>
+      </Container>
+    );
+  };
+
   return (
     <Router>
-      <Dash path="/songs" />
+      <Songs path="/songs" />
+      <Playlists path="/playlists" />
       <Song path="/songs/:songId" />
       <EditSong path="/songs/edit/:songId" />
     </Router>

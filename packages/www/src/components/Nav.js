@@ -7,6 +7,9 @@ const Nav = () => (
     <NavLink as={Link} to="/songs" p={2}>
       Songs
     </NavLink>
+    <NavLink as={Link} to="/playlists" p={2}>
+      Playlists
+    </NavLink>
   </Flex>
 );
 

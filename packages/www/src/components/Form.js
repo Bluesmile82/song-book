@@ -56,6 +56,32 @@ const ADD_SONG = gql`
   }
 `;
 
+const ADD_PLAYLIST = gql`
+  mutation AddPlaylist(
+    $name: String!
+  ) {
+    addSong(
+      name: $name
+    ) {
+      id
+    }
+  }
+`;
+
+const UPDATE_PLAYLIST = gql`
+  mutation UpdatePlaylist(
+    $id: ID!
+    $name: String!
+  ) {
+    updateSong(
+      id: $id
+      name: $name
+    ) {
+      id
+    }
+  }
+`;
+
 const UPDATE_SONG = gql`
   mutation UpdateSong(
     $id: ID!
@@ -129,41 +155,67 @@ const FormLabel = React.forwardRef(
 );
 
 
-const Form = ({ currentSong, refetch }) => {
-  const { id } = currentSong || {};
+const Form = ({ currentItem, refetch, collection }) => {
+
+  const { id } = currentItem || {};
+
+  const nameRef = useRef(null);
+
   const titleRef = useRef(null);
   const authorRef = useRef(null);
   const keyRef = useRef(null);
   const styleRef = useRef(null);
   const lyricsRef = useRef(null);
   const youtubeIdRef = useRef(null);
+
   const [addSong] = useMutation(ADD_SONG);
   const [updateSong] = useMutation(UPDATE_SONG);
+
+  const [addPlaylist] = useMutation(ADD_PLAYLIST);
+  const [updatePlaylist] = useMutation(UPDATE_PLAYLIST);
+
   const onSubmit = async (e, id) => {
     e.preventDefault();
     if (id) {
-      await updateSong({
-        variables: {
-          id,
-          title: titleRef.current.value,
-          key: keyRef.current.value,
-          author: authorRef.current.value,
-          style: styleRef.current.value,
-          lyrics: lyricsRef.current.value,
-          youtubeId: youtubeIdRef.current.value
-        }
-      });
+      if (collection === 'playlists') {
+        await updatePlaylist({
+          variables: {
+            id,
+            name: nameRef.current.value,
+          }
+        });
+      } else {
+        await updateSong({
+          variables: {
+            id,
+            title: titleRef.current.value,
+            key: keyRef.current.value,
+            author: authorRef.current.value,
+            style: styleRef.current.value,
+            lyrics: lyricsRef.current.value,
+            youtubeId: youtubeIdRef.current.value
+          }
+        });
+      }
     } else {
-      await addSong({
-        variables: {
-          title: titleRef.current.value,
-          key: keyRef.current.value,
-          author: authorRef.current.value,
-          style: styleRef.current.value,
-          lyrics: lyricsRef.current.value,
-          youtubeId: youtubeIdRef.current.value
+      if (collection === 'playlists') {
+        await addPlaylist({
+          variables: {
+            name: nameRef.current.value
+          }
+        });
+      } else {
+          await addSong({
+            variables: {
+              title: titleRef.current.value,
+              key: keyRef.current.value,
+              author: authorRef.current.value,
+              style: styleRef.current.value,
+              lyrics: lyricsRef.current.value,
+              youtubeId: youtubeIdRef.current.value
+            }
+          });
         }
-      });
     }
     await refetch();
   };
@@ -174,41 +226,55 @@ const Form = ({ currentSong, refetch }) => {
       onSubmit={e => onSubmit(e, id)}
       sx={{ flexDirection: 'column' }}
     >
-      <FormLabel
-        defaultValue={currentSong ? currentSong.title : undefined}
-        label="title"
-        ref={titleRef}
-      />
-      <FormLabel
-        label="author"
-        ref={authorRef}
-        defaultValue={currentSong ? currentSong.author : undefined}
-      />
-      <FormLabel
-        label="key"
-        ref={keyRef}
-        selectOptions={keys}
-        defaultValue={currentSong ? currentSong.key : undefined}
-      />
-      <FormLabel
-        label="style"
-        ref={styleRef}
-        defaultValue={currentSong ? currentSong.style : undefined}
-      />
-      <FormLabel
-        label="lyrics"
-        ref={lyricsRef}
-        textarea
-        defaultValue={currentSong ? currentSong.lyrics : undefined}
-      />
-      <FormLabel
-        label="youtube id"
-        ref={youtubeIdRef}
-        defaultValue={currentSong ? currentSong.youtubeId : undefined}
-      />
-      <Button sx={{ marginLeft: 1 }}>Submit</Button>
+      {collection === 'playlists' ? (
+          <>
+            <FormLabel
+              defaultValue={currentItem ? currentItem.title : undefined}
+              label="Name"
+              ref={nameRef}
+            />
+          </>
+        )
+        : (
+          <>
+            <FormLabel
+              defaultValue={currentItem ? currentItem.title : undefined}
+              label="title"
+              ref={titleRef}
+            />
+            <FormLabel
+              label="author"
+              ref={authorRef}
+              defaultValue={currentItem ? currentItem.author : undefined}
+            />
+            <FormLabel
+              label="key"
+              ref={keyRef}
+              selectOptions={keys}
+              defaultValue={currentItem ? currentItem.key : undefined}
+            />
+            <FormLabel
+              label="style"
+              ref={styleRef}
+              defaultValue={currentItem ? currentItem.style : undefined}
+            />
+            <FormLabel
+              label="lyrics"
+              ref={lyricsRef}
+              textarea
+              defaultValue={currentItem ? currentItem.lyrics : undefined}
+            />
+            <FormLabel
+              label="youtube id"
+              ref={youtubeIdRef}
+              defaultValue={currentItem ? currentItem.youtubeId : undefined}
+            />
+          </>
+          )
+        }
+        <Button sx={{ marginLeft: 1 }}>Submit</Button>
     </Flex>
-  )
+  );
 }
 
 export default Form;
