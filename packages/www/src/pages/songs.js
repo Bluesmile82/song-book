@@ -62,6 +62,7 @@ const UPDATE_SONG = gql`
     $youtubeId: String
   ) {
     updateSong(
+      id: $id,
       title: $title,
       author: $author,
       key: $key,
@@ -122,7 +123,7 @@ export default props => {
     await refetch();
   };
 
-  const FormLabel = React.forwardRef(({ label, textarea, selectOptions }, ref) => {
+  const FormLabel = React.forwardRef(({ defaultValue, label, textarea, selectOptions }, ref) => {
     if (selectOptions) {
       return (
         <Label
@@ -139,6 +140,7 @@ export default props => {
             sx={{
               minWidth: '60px'
             }}
+            defaultValue={defaultValue}
           >
             {selectOptions.map(s => (
               <option key={s}>{s}</option>
@@ -161,6 +163,7 @@ export default props => {
           ref={ref}
           sx={{ marginLeft: 3, whiteSpace: 'pre-wrap' }}
           name={label}
+          defaultValue={defaultValue}
         />
       </Label>
     );
@@ -189,18 +192,44 @@ export default props => {
     'B#',
     'Bb'
   ];
-  const form = (editId = false) => (
+  const form = (editId = false, currentSong) => (
     <Flex
       as="form"
       onSubmit={e => onSubmit(e, editId)}
       sx={{ flexDirection: 'column' }}
     >
-      <FormLabel label="title" ref={titleRef} />
-      <FormLabel label="author" ref={authorRef} />
-      <FormLabel label="key" ref={keyRef} selectOptions={keys} />
-      <FormLabel label="style" ref={styleRef} />
-      <FormLabel label="lyrics" ref={lyricsRef} textarea />
-      <FormLabel label="youtube id" ref={youtubeIdRef} />
+      <FormLabel
+        defaultValue={editId ? currentSong.title : undefined}
+        label="title"
+        ref={titleRef}
+      />
+      <FormLabel
+        label="author"
+        ref={authorRef}
+        defaultValue={editId ? currentSong.author : undefined}
+      />
+      <FormLabel
+        label="key"
+        ref={keyRef}
+        selectOptions={keys}
+        defaultValue={editId ? currentSong.key : undefined}
+      />
+      <FormLabel
+        label="style"
+        ref={styleRef}
+        defaultValue={editId ? currentSong.style : undefined}
+      />
+      <FormLabel
+        label="lyrics"
+        ref={lyricsRef}
+        textarea
+        defaultValue={editId ? currentSong.lyrics : undefined}
+      />
+      <FormLabel
+        label="youtube id"
+        ref={youtubeIdRef}
+        defaultValue={editId ? currentSong.youtubeId : undefined}
+      />
       <Button sx={{ marginLeft: 1 }}>Submit</Button>
     </Flex>
   );
@@ -315,7 +344,7 @@ export default props => {
                 allowfullscreen
               ></iframe>
             )}
-            {form(id)}
+            {form(id, song)}
           </Flex>
         )}
       </Flex>
