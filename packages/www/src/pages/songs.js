@@ -177,7 +177,7 @@ export default props => {
           <Heading as="h1" sx={{ marginBottom: 3 }}>
             Songs
           </Heading>
-          <Form />
+          <Form refetch={refetch} />
           <ViewSongs />
         </Flex>
       </Container>

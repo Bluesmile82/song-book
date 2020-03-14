@@ -40,7 +40,6 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     songs: async (parent, args, { user }) => {
-      console.log('x', { user, args, parent });
 
       if (!user) {
         throw new Error('Must be authenticated to see the songs');

@@ -79,7 +79,6 @@ const resolvers = {
       _,
       { id, title, author, key, style, lyrics, youtubeId }
     ) => {
-      console.log('sp', id)
       const results = await client.query(
         q.Update(q.Ref(q.Collection('songs'), id), {
           data: {

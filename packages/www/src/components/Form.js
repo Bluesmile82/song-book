@@ -130,7 +130,7 @@ const FormLabel = React.forwardRef(
 
 
 const Form = ({ currentSong, refetch }) => {
-  const { id } = currentSong;
+  const { id } = currentSong || {};
   const titleRef = useRef(null);
   const authorRef = useRef(null);
   const keyRef = useRef(null);
@@ -142,15 +142,6 @@ const Form = ({ currentSong, refetch }) => {
   const onSubmit = async (e, id) => {
     e.preventDefault();
     if (id) {
-      console.log({
-        id,
-        title: titleRef.current.value,
-        key: keyRef.current.value,
-        author: authorRef.current.value,
-        style: styleRef.current.value,
-        lyrics: lyricsRef.current.value,
-        youtubeId: youtubeIdRef.current.value
-      });
       await updateSong({
         variables: {
           id,
