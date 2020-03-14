@@ -18,20 +18,20 @@ const typeDefs = gql`
   }
   type Mutation {
     addSong(
-      title: String!,
-      author: String,
-      key: String,
-      style: String,
-      lyrics: String,
+      title: String!
+      author: String
+      key: String
+      style: String
+      lyrics: String
       youtubeId: String
     ): Song
     updateSong(
-      id: String!,
-      title: String!,
-      author: String,
-      key: String,
-      style: String,
-      lyrics: String,
+      id: ID!
+      title: String!
+      author: String
+      key: String
+      style: String
+      lyrics: String
       youtubeId: String
     ): Song
   }
