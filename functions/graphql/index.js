@@ -40,21 +40,24 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     songs: async () => {
-      const results = await client.query(
-        q.Paginate(q.Match(q.Index('all_songs')))
-      );
-      return results.data.map(([ref, title, youtubeId]) => ({
-        id: ref.id,
-        title,
-        youtubeId
-      }));
+      const results = await client.query(q.Paginate(q.Match(q.Index('songs'))));
+      if (!results) return [];
+      return results.data.map(d => {
+        const [ref, title, author, key, style, lyrics, youtubeId] = d;
+        return {
+          id: ref.id,
+          title,
+          author,
+          key,
+          style,
+          lyrics,
+          youtubeId
+        };
+      });
     }
   },
   Mutation: {
-    addSong: async (
-      _,
-      { title, author, key, style, lyrics, youtubeId },
-    ) => {
+    addSong: async (_, { title, author, key, style, lyrics, youtubeId }) => {
       const results = await client.query(
         q.Create(q.Collection('songs'), {
           data: {

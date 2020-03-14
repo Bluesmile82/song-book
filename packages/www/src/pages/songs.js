@@ -1,6 +1,5 @@
 import { Router, Link } from '@reach/router';
-import React, { useContext, useRef, useState } from 'react';
-// import { IdentityContext } from '../../identity-context';
+import React, { useRef, useState } from 'react';
 import {
   Container,
   Heading,
@@ -61,7 +60,6 @@ const ADD_SONG = gql`
 // `;
 
 export default props => {
-  // const { user, identity: netlifyIdentity } = useContext(IdentityContext);
   const titleRef = useRef(null);
   const authorRef = useRef(null);
   const keyRef = useRef(null);
