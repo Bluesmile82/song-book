@@ -76,9 +76,7 @@ const resolvers = {
           playlists
         };
       });
-    }
-  },
-  Query: {
+    },
     playlists: async () => {
       const results = await client.query(q.Paginate(q.Match(q.Index('playlists'))));
       console.log('s', results)
