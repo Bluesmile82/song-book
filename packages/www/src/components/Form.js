@@ -230,7 +230,7 @@ const Form = ({ currentItem, refetch, collection }) => {
       {collection === 'playlists' ? (
           <>
             <FormLabel
-              defaultValue={currentItem ? currentItem.title : undefined}
+              defaultValue={currentItem ? currentItem.name : undefined}
               label="Name"
               ref={nameRef}
             />
