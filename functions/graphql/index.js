@@ -35,6 +35,8 @@ const typeDefs = gql`
       playlists: [String]
     ): Song
     updatePlaylist(id: ID!, name: String, songs: [ID]): Playlist
+    deletePlaylist(id: ID!): Playlist
+    deleteSong(id: ID!): Song
     updateSong(
       id: ID!
       title: String
@@ -52,7 +54,6 @@ const resolvers = {
   Query: {
     songs: async () => {
       const results = await client.query(q.Paginate(q.Match(q.Index('songs'))));
-      console.log('results', results)
       if (!results) return [];
       return results.data.map(d => {
         const [
@@ -78,15 +79,12 @@ const resolvers = {
       });
     },
     playlists: async () => {
-      const results = await client.query(q.Paginate(q.Match(q.Index('playlists'))));
-      console.log('s', results)
+      const results = await client.query(
+        q.Paginate(q.Match(q.Index('playlists')))
+      );
       if (!results) return [];
       return results.data.map(d => {
-        const [
-          ref,
-          name,
-          songs
-        ] = d;
+        const [ref, name, songs] = d;
         return {
           id: ref.id,
           name,
@@ -148,6 +146,22 @@ const resolvers = {
       );
       return {
         ...results.data,
+        id: results.ref.id
+      };
+    },
+    deletePlaylist: async (_, { id }) => {
+      const results = await client.query(
+        q.Delete(q.Ref(q.Collection('playlists'), id))
+      );
+      return {
+        id: results.ref.id
+      };
+    },
+    deleteSong: async (_, { id }) => {
+      const results = await client.query(
+        q.Delete(q.Ref(q.Collection('songs'), id))
+      );
+      return {
         id: results.ref.id
       };
     },
