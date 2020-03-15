@@ -22,13 +22,32 @@ const GET_SONGS = gql`
       lyrics
       style
       youtubeId
+      playlists {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const GET_PLAYLISTS = gql`
+  query GetPlaylists {
+    playlists {
+      id
+      name
     }
   }
 `;
 
 export default () => {
   const { loading, error, data, refetch } = useQuery(GET_SONGS);
-console.log({ loading, error, data, refetch });
+  const {
+    loading: playlistsLoading,
+    error: playlistsError,
+    data: playlistsData,
+    refetch: playlistsRefetch
+  } = useQuery(GET_PLAYLISTS);
+
   const ViewSongs = () => {
     const [search, setSearch] = useState('');
     return(
@@ -69,8 +88,13 @@ console.log({ loading, error, data, refetch });
         {error && <div>{error.message}</div>}
         {!loading && !error && song && (
           <Flex sx={{ flexDirection: 'column' }}>
-            <Box p={2} color="white" bg="primary">
-              {song.title}
+            <Box p={2} color="white" bg="primary" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>
+                <h1>{song.title}</h1>
+                <div>{song.author}</div>
+              </span>
+              <div>{song.style}</div>
+              <div>{song.key}</div>
             </Box>
             <Box p={4}>
               <Flex
@@ -79,10 +103,7 @@ console.log({ loading, error, data, refetch });
                   alignItems: 'center'
                 }}
               >
-                <div>{song.author}</div>
-                <div>{song.key}</div>
-                <div>{song.style}</div>
-                <div>{song.lyrics}</div>
+                <Box sx={{ whiteSpace: 'pre-line' }}>{song.lyrics}</Box>
               </Flex>
             </Box>
             {song.youtubeId && (
@@ -107,6 +128,7 @@ console.log({ loading, error, data, refetch });
 
   const editSong = (id) => {
     const song = data && data.songs.find(s => s.id === id);
+    const playlists = (playlistsLoading || playlistsError) ? [] : playlistsData.playlists;
     return (
       <Flex sx={{ flexDirection: 'column' }}>
         {loading && <div>Loading...</div>}
@@ -140,7 +162,7 @@ console.log({ loading, error, data, refetch });
                 allowfullscreen
               ></iframe>
             )}
-            <Form currentItem={song} refetch={refetch}/>
+            <Form currentItem={song} refetch={refetch} playlists={playlists} />
           </Flex>
         )}
       </Flex>
@@ -170,6 +192,9 @@ console.log({ loading, error, data, refetch });
   }
 
   const Songs = () => {
+    const playlists =
+      playlistsLoading || playlistsError ? [] : playlistsData.playlists;
+    console.log('s', playlistsError, playlistsLoading, playlistsData);
     return (
       <Container>
         <Flex sx={{ flexDirection: 'column', padding: 3, align: 'right' }}>
@@ -177,7 +202,7 @@ console.log({ loading, error, data, refetch });
           <Heading as="h1" sx={{ marginBottom: 3 }}>
             Songs
           </Heading>
-          <Form refetch={refetch} />
+          <Form refetch={refetch} playlists={playlists}/>
           <ViewSongs />
         </Flex>
       </Container>

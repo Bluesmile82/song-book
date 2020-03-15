@@ -1,6 +1,9 @@
 import React, { useRef }  from 'react';
 import { gql, useMutation } from '@apollo/client';
 
+import { MultiSelect } from 'react-selectize';
+import '../../../../node_modules/react-selectize/themes/index.css';
+
 import {
   Button,
   Flex,
@@ -107,8 +110,26 @@ const UPDATE_SONG = gql`
 `;
 
 const FormLabel = React.forwardRef(
-  ({ defaultValue, label, textarea, selectOptions }, ref) => {
+  ({ defaultValue, label, textarea, selectOptions, multi }, ref) => {
     if (selectOptions) {
+      if (multi) {
+        return (
+          <Label
+            sx={{
+              display: 'flex',
+              marginBottom: 3,
+              justifyContent: 'space-between'
+            }}
+          >
+            <span>{label}</span>
+            <MultiSelect
+              ref={ref}
+              options={selectOptions.map(o => ({ value: o.id, label: o.name }))}
+              defaultValues={defaultValue || undefined}
+            />
+          </Label>
+        );
+      }
       return (
         <Label
           sx={{
@@ -145,7 +166,7 @@ const FormLabel = React.forwardRef(
         <span>{label}</span>
         <InputComponent
           ref={ref}
-          sx={{ marginLeft: 3, whiteSpace: 'pre-wrap' }}
+          sx={{ marginLeft: 3, whiteSpace: 'pre-line' }}
           name={label}
           defaultValue={defaultValue}
         />
@@ -155,7 +176,7 @@ const FormLabel = React.forwardRef(
 );
 
 
-const Form = ({ currentItem, refetch, collection }) => {
+const Form = ({ currentItem, refetch, collection, playlists }) => {
 
   const { id } = currentItem || {};
 
@@ -167,6 +188,7 @@ const Form = ({ currentItem, refetch, collection }) => {
   const styleRef = useRef(null);
   const lyricsRef = useRef(null);
   const youtubeIdRef = useRef(null);
+  const playlistsRef = useRef(null);
 
   const [addSong] = useMutation(ADD_SONG);
   const [updateSong] = useMutation(UPDATE_SONG);
@@ -176,7 +198,6 @@ const Form = ({ currentItem, refetch, collection }) => {
 
   const onSubmit = async (e, id) => {
     e.preventDefault();
-    console.log(collection)
     if (id) {
       if (collection === 'playlists') {
         await updatePlaylist({
@@ -213,14 +234,14 @@ const Form = ({ currentItem, refetch, collection }) => {
               author: authorRef.current.value,
               style: styleRef.current.value,
               lyrics: lyricsRef.current.value,
-              youtubeId: youtubeIdRef.current.value
+              youtubeId: youtubeIdRef.current.value,
+              playlists: playlistsRef.current.state.values.map(v => v.label)
             }
           });
         }
     }
     await refetch();
   };
-
   return (
     <Flex
       as="form"
@@ -228,52 +249,59 @@ const Form = ({ currentItem, refetch, collection }) => {
       sx={{ flexDirection: 'column' }}
     >
       {collection === 'playlists' ? (
-          <>
+        <>
+          <FormLabel
+            defaultValue={currentItem ? currentItem.name : undefined}
+            label="Name"
+            ref={nameRef}
+          />
+        </>
+      ) : (
+        <>
+          <FormLabel
+            defaultValue={currentItem ? currentItem.title : undefined}
+            label="title"
+            ref={titleRef}
+          />
+          <FormLabel
+            label="author"
+            ref={authorRef}
+            defaultValue={currentItem ? currentItem.author : undefined}
+          />
+          <FormLabel
+            label="key"
+            ref={keyRef}
+            selectOptions={keys}
+            defaultValue={currentItem ? currentItem.key : undefined}
+          />
+          <FormLabel
+            label="style"
+            ref={styleRef}
+            defaultValue={currentItem ? currentItem.style : undefined}
+          />
+          <FormLabel
+            label="lyrics"
+            ref={lyricsRef}
+            textarea
+            defaultValue={currentItem ? currentItem.lyrics : undefined}
+          />
+          <FormLabel
+            label="youtube id"
+            ref={youtubeIdRef}
+            defaultValue={currentItem ? currentItem.youtubeId : undefined}
+          />
+          {playlists && (
             <FormLabel
-              defaultValue={currentItem ? currentItem.name : undefined}
-              label="Name"
-              ref={nameRef}
+              label="playlists"
+              ref={playlistsRef}
+              selectOptions={playlists}
+              defaultValue={currentItem ? currentItem.playlists : undefined}
+              multi
             />
-          </>
-        )
-        : (
-          <>
-            <FormLabel
-              defaultValue={currentItem ? currentItem.title : undefined}
-              label="title"
-              ref={titleRef}
-            />
-            <FormLabel
-              label="author"
-              ref={authorRef}
-              defaultValue={currentItem ? currentItem.author : undefined}
-            />
-            <FormLabel
-              label="key"
-              ref={keyRef}
-              selectOptions={keys}
-              defaultValue={currentItem ? currentItem.key : undefined}
-            />
-            <FormLabel
-              label="style"
-              ref={styleRef}
-              defaultValue={currentItem ? currentItem.style : undefined}
-            />
-            <FormLabel
-              label="lyrics"
-              ref={lyricsRef}
-              textarea
-              defaultValue={currentItem ? currentItem.lyrics : undefined}
-            />
-            <FormLabel
-              label="youtube id"
-              ref={youtubeIdRef}
-              defaultValue={currentItem ? currentItem.youtubeId : undefined}
-            />
-          </>
-          )
-        }
-        <Button sx={{ marginLeft: 1 }}>Submit</Button>
+          )}
+        </>
+      )}
+      <Button sx={{ marginLeft: 1 }}>Submit</Button>
     </Flex>
   );
 }
