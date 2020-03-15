@@ -45,6 +45,7 @@ const ADD_SONG = gql`
     $style: String!
     $lyrics: String!
     $youtubeId: String
+    $playlists: [String]
   ) {
     addSong(
       title: $title
@@ -53,6 +54,7 @@ const ADD_SONG = gql`
       style: $style
       lyrics: $lyrics
       youtubeId: $youtubeId
+      playlists: $playlists
     ) {
       id
     }
@@ -166,7 +168,7 @@ const FormLabel = React.forwardRef(
         <span>{label}</span>
         <InputComponent
           ref={ref}
-          sx={{ marginLeft: 3, whiteSpace: 'pre-line' }}
+          sx={{ marginLeft: 3 }}
           name={label}
           defaultValue={defaultValue}
         />

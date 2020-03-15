@@ -113,6 +113,9 @@ const resolvers = {
       _,
       { title, author, key, style, lyrics, youtubeId, playlists }
     ) => {
+      const updatedPlaylists = await client.query(
+        q.Paginate(q.Match(q.Index('playlists_by_name'), playlists))
+      );
       const results = await client.query(
         q.Create(q.Collection('songs'), {
           data: {
@@ -122,7 +125,7 @@ const resolvers = {
             style,
             lyrics,
             youtubeId,
-            playlists
+            playlists: updatedPlaylists.data
           }
         })
       );
