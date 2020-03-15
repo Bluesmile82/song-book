@@ -32,7 +32,7 @@ const typeDefs = gql`
       style: String
       lyrics: String
       youtubeId: String
-      playlists: [ID]
+      playlists: [String]
     ): Song
     updatePlaylist(id: ID!, name: String, songs: [ID]): Playlist
     updateSong(
@@ -43,7 +43,7 @@ const typeDefs = gql`
       style: String
       lyrics: String
       youtubeId: String
-      playlists: [ID]
+      playlists: [String]
     ): Song
   }
 `;
